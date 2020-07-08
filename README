@@ -1,0 +1,35 @@
+Written by Hyunmin Yang, HANUL, KOREA university
+Thanks to Andrii Tykhonov(https://github.com/tihonav/cad-to-geant4-converter) for providing STL samples
+and to the writer of persistency/gdml/G01 example progream.
+
+The main code is written in STPParser.hh and STLParser.cc file.
+If you want implement into your project, please refer to this code.
+
+This example demonstrates the usage of the STL reader and writer. It allows
+to export geometry descriptions in an application independent format (STL,
+stereolithography).
+The STL files can be then used to interchange geometries between different
+applications and users.
+As most of 3D cad programs support exporting as STL in ascii format
+you can export your 3D model as STL file and convert into G4TessellatedSolid instance using STLParser class.
+
+Several simple STL files are provided as stl file(https://github.com/tihonav/cad-to-geant4-converter) thanks to .
+scii STL files have to follow standard format such as
+------------------------------------------------------------------------
+facet normal ni nj nk
+    outer loop
+        vertex v1x v1y v1z
+        vertex v2x v2y v2z
+        vertex v3x v3y v3z
+    endloop
+endfacet
+-------------------------------------------------------------------------
+
+HOW TO BUILD THE EXAMPLE ?
+
+- Compile and link to generate the executable (in your CMAKE build directory):
+ 	      % make
+
+- Execute the application.
+  o For reading and visualize interactively a ascii stl file:
+ 	      % load_stl [stl-file-in].stl [unit mm, m, cm]
