@@ -4,6 +4,7 @@
 #include "G4TriangularFacet.hh"
 #include <iostream>
 #include <fstream>
+#include <cinttypes>
 
 STLParser *STLParser::fInstance = nullptr;
 
@@ -118,12 +119,85 @@ G4TessellatedSolid *STLParser::ParseStlAscii(G4String name, G4String file, G4Str
   ts->SetSolidClosed(true);
   fileIn.close();
   G4cout << "-------------------------------------------------" << G4endl;
-  G4cout << "G4TessellatedSolid Name : " << ts->GetName() << G4endl;
-  G4cout << "# of Facets             : " << ts->GetNumberOfFacets() << G4endl;
-  G4cout << "Allocated Memory        : " << ts->AllocatedMemory() / 1024 << " kB" << G4endl;
+  G4cout << "G4TessellatedSolid Name     : " << ts->GetName() << G4endl;
+  G4cout << "# of Facets                 : " << ts->GetNumberOfFacets() << G4endl;
+  G4cout << "Allocated Memory            : " << ts->AllocatedMemory() / 1024 << " kB" << G4endl;
+  G4cout << "Allocated Memory w.o voxels : " << ts->AllocatedMemoryWithoutVoxels() / 1024 << " kB" << G4endl;
   G4cout << "-------------------------------------------------" << G4endl;
   return ts;
 }
+
+G4TessellatedSolid *STLParser::ParseStlBinary(G4String name, G4String file, G4String unit)
+{
+  G4double u = 0;
+  std::ifstream fileIn;
+  fileIn.open(file.data(), std::ios::binary);
+  if (unit == "mm")
+    u = mm;
+  else if (unit == "cm")
+    u = cm;
+  else if (unit == "m")
+    u = m;
+  else if (!fileIn.is_open())
+  {
+    std::ostringstream message;
+    message << "File Name : " << file.data();
+    G4Exception("STLParser::ParseStlAscii(G4String, G4String)", "STLPARSER0001",
+                FatalErrorInArgument, message);
+  }
+  else
+  {
+    std::ostringstream message;
+    message << "Input unit : " << unit.data();
+    G4Exception("STLParser::ParseStlAscii(G4String, G4String)", "STLPARSER0000",
+                FatalErrorInArgument, message);
+  }
+  G4TessellatedSolid *ts = new G4TessellatedSolid(name);
+  G4TriangularFacet *fc;
+  G4ThreeVector normal, vertex1, vertex2, vertex3;
+  uint8_t buffer[80];
+  uint32_t nFacet;
+  uint16_t att;
+  float n[3], v1[3], v2[3], v3[3];
+
+  // parsing STL file
+  fileIn.read((char*)buffer, 80*sizeof(uint8_t));;
+  fileIn.read((char*)(&nFacet), sizeof(nFacet));
+  for(uint32_t i = 0;i < nFacet;i++)
+  {
+    fileIn.read((char*)n, 3*sizeof(float));
+    fileIn.read((char*)v1, 3*sizeof(float));
+    fileIn.read((char*)v2, 3*sizeof(float));
+    fileIn.read((char*)v3, 3*sizeof(float));
+    fileIn.read((char*)&att, sizeof(uint16_t));
+    /*
+    std::cout << "normal         : " << n[0] << " " << n[1] << " " << n[2] << std::endl;
+    std::cout << "vertex1        : " << v1[0] << " " << v1[1] << " " << v1[2] << std::endl;
+    std::cout << "vertex2        : " << v2[0] << " " << v2[1] << " " << v2[2] << std::endl;
+    std::cout << "vertex3        : " << v3[0] << " " << v3[1] << " " << v3[2] << std::endl;
+    std::cout << "att            : " << att << std::endl;
+    */
+    normal = G4ThreeVector(n[0]*u, n[1]*u, n[2]*u);
+    vertex1 = G4ThreeVector(v1[0]*u, v1[1]*u, v1[2]*u);
+    vertex2 = G4ThreeVector(v2[0]*u, v2[1]*u, v2[2]*u);
+    vertex3 = G4ThreeVector(v3[0]*u, v3[1]*u, v3[2]*u);
+    ArrangeCCW(normal, vertex1, vertex2, vertex3);
+    fc = new G4TriangularFacet(vertex1, vertex2, vertex3, ABSOLUTE);
+    ts->AddFacet(fc);
+  }
+  ts->SetSolidClosed(true);
+  fileIn.close();
+  G4cout << "-------------------------------------------------" << G4endl;
+  G4cout << "Binary STL file header -> " << G4endl;
+  G4cout << buffer << G4endl;
+  G4cout << "G4TessellatedSolid Name     : " << ts->GetName() << G4endl;
+  G4cout << "# of Facets                 : " << ts->GetNumberOfFacets() << G4endl;
+  G4cout << "Allocated Memory            : " << ts->AllocatedMemory() / 1024 << " kB" << G4endl;
+  G4cout << "Allocated Memory w.o voxels : " << ts->AllocatedMemoryWithoutVoxels() / 1024 << " kB" << G4endl;
+  G4cout << "-------------------------------------------------" << G4endl;
+  return ts;
+}
+
 
 void STLParser::ArrangeCCW(G4ThreeVector &nor, G4ThreeVector &vec1, G4ThreeVector &vec2, G4ThreeVector &vec3)
 {

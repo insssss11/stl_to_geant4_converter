@@ -28,7 +28,7 @@
 void PrintUsage()
 {
   G4cout << G4endl;
-  G4cout << "Usage: load_stl <input_stl_file:mandatory> <unit: [m][cm][mm]>" << G4endl;
+  G4cout << "Usage: load_stl <input_stl_file:mandatory> <unit: [m][cm][mm]> <binary or ascii>" << G4endl;
   G4cout << G4endl;  
 }
 
@@ -36,25 +36,28 @@ int main(int argc, char **argv)
 {
   G4String format;
   G4String file;
-  G4String unit;  
-  if (argc != 3)
+  G4String unit;
+  if (argc != 4)
   {
     PrintUsage();
     return -1;
   }
-  file = argv[1];unit = argv[2];
+  file = argv[1];unit = argv[2];format = argv[3];
   if(!((unit == "m" || unit == "cm" || unit == "mm")))
   {
     PrintUsage();
-    return -1;    
+    return -1;
   }
+  else if(!((format == "binary" || format == "ascii")))
 #ifdef G4MULTITHREADED
+  printf("Multi Thread Mode(%1d threads)\n", 4);
   G4MTRunManager *runManager = new G4MTRunManager;
+  runManager->SetNumberOfThreads(4);
 #else
+  printf("Multi Thread Mode\n");
   G4RunManager *runManager = new G4RunManager;
 #endif
-
-  runManager->SetUserInitialization(new G01DetectorConstruction(file, "-a", unit));
+  runManager->SetUserInitialization(new G01DetectorConstruction(file, format, unit));
   runManager->SetUserInitialization(new FTFP_BERT);
   runManager->SetUserInitialization(new G01ActionInitialization());
 

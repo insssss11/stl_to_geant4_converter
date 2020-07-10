@@ -48,6 +48,8 @@ set(G01_SCRIPTS
   DAM_EQM_LshapeSIMPL_CarbonFibre.stl 
   test1_ascii.stl 
   test2_ascii.stl
+  test1_binary.stl 
+  test2_binary.stl 
   vis.mac 
   init_vis.mac
   )

@@ -16,7 +16,7 @@ class STLParser{
   public:
     static STLParser* Instance();
     G4TessellatedSolid* ParseStlAscii(G4String name, G4String file, G4String unit = "mm");
-    // G4TessellatedSolid* ParseStlBinary(G4String name, G4String file, G4String unit = "mm");
+    G4TessellatedSolid* ParseStlBinary(G4String name, G4String file, G4String unit = "mm");
     ~STLParser(){}
   private:
     STLParser(){}

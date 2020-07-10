@@ -8,9 +8,12 @@
 #include "G4SystemOfUnits.hh"
 #include "G4Material.hh"
 
-G01DetectorConstruction::G01DetectorConstruction(G4String file, G4String foramt, G4String unit)
+G01DetectorConstruction::G01DetectorConstruction(G4String file, G4String format, G4String unit)
 {
-  fSolid = STLParser::Instance()->ParseStlAscii("test_solid", file, unit);
+  if(format == "ascii")
+    fSolid = STLParser::Instance()->ParseStlAscii("test_solid", file, unit);
+  else if(format == "binary")
+    fSolid = STLParser::Instance()->ParseStlBinary("test_solid", file, unit);
   // else if(format == "-b")
   //   fSolid = STLParser::Instance()->ParseStlBinary("test_solid", file, unit);
 }
