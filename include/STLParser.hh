@@ -17,7 +17,10 @@ class STLParser{
     static STLParser* Instance();
     G4TessellatedSolid* ParseStlAscii(G4String name, G4String file, G4String unit = "mm");
     G4TessellatedSolid* ParseStlBinary(G4String name, G4String file, G4String unit = "mm");
-    ~STLParser(){}
+    ~STLParser()
+    {
+      fInstance = nullptr;
+    }
   private:
     STLParser(){}
     void ArrangeCCW(G4ThreeVector& nor, G4ThreeVector& vec1, G4ThreeVector& vec2, G4ThreeVector& vec3);
