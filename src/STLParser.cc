@@ -23,24 +23,25 @@ G4TessellatedSolid *STLParser::ParseStlAscii(G4String name, G4String file, G4Str
   std::ifstream fileIn;
   fileIn.open(file.data(), std::ios::in);
   char buffer[256];
+  if (!fileIn.is_open())
+  {
+    std::ostringstream message;
+    message << "Faied to open file : " << file.data();
+    G4Exception("STLParser::ParseStlAscii(G4String, G4String)", "STLPARSER0000",
+                FatalErrorInArgument, message);
+  }  
+  
   if (unit == "mm")
     u = mm;
   else if (unit == "cm")
     u = cm;
   else if (unit == "m")
     u = m;
-  else if (!fileIn.is_open())
-  {
-    std::ostringstream message;
-    message << "File Name : " << file.data();
-    G4Exception("STLParser::ParseStlAscii(G4String, G4String)", "STLPARSER0001",
-                FatalErrorInArgument, message);
-  }
   else
   {
     std::ostringstream message;
     message << "Input unit : " << unit.data();
-    G4Exception("STLParser::ParseStlAscii(G4String, G4String)", "STLPARSER0000",
+    G4Exception("STLParser::ParseStlAscii(G4String, G4String)", "STLPARSER0001",
                 FatalErrorInArgument, message);
   }
   G4TessellatedSolid *ts = new G4TessellatedSolid(name);
@@ -132,24 +133,24 @@ G4TessellatedSolid *STLParser::ParseStlBinary(G4String name, G4String file, G4St
   G4double u = 0;
   std::ifstream fileIn;
   fileIn.open(file.data(), std::ios::binary);
+  if (!fileIn.is_open())
+  {
+    std::ostringstream message;
+    message << "Faied to open file : " << file.data();
+    G4Exception("STLParser::ParseStlBinary(G4String, G4String)", "STLPARSER0002",
+                FatalErrorInArgument, message);
+  }  
   if (unit == "mm")
     u = mm;
   else if (unit == "cm")
     u = cm;
   else if (unit == "m")
     u = m;
-  else if (!fileIn.is_open())
-  {
-    std::ostringstream message;
-    message << "File Name : " << file.data();
-    G4Exception("STLParser::ParseStlAscii(G4String, G4String)", "STLPARSER0001",
-                FatalErrorInArgument, message);
-  }
   else
   {
     std::ostringstream message;
     message << "Input unit : " << unit.data();
-    G4Exception("STLParser::ParseStlAscii(G4String, G4String)", "STLPARSER0000",
+    G4Exception("STLParser::ParseStlBinary(G4String, G4String)", "STLPARSER0003",
                 FatalErrorInArgument, message);
   }
   G4TessellatedSolid *ts = new G4TessellatedSolid(name);
