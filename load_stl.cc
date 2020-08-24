@@ -45,16 +45,20 @@ int main(int argc, char **argv)
   file = argv[1];unit = argv[2];format = argv[3];
   if(!((unit == "m" || unit == "cm" || unit == "mm")))
   {
-    PrintUsage();
+    printf("The second arg candidates : [m] [cm] [mm]\n");
     return -1;
   }
   else if(!((format == "binary" || format == "ascii")))
+  {
+    printf("The third arg candidates : [binary] [ascii]]\n");    
+    return -1;
+  }
 #ifdef G4MULTITHREADED
   printf("Multi Thread Mode(%1d threads)\n", 4);
   G4MTRunManager *runManager = new G4MTRunManager;
   runManager->SetNumberOfThreads(4);
 #else
-  printf("Multi Thread Mode\n");
+  printf("Single Thread Mode\n");
   G4RunManager *runManager = new G4RunManager;
 #endif
   runManager->SetUserInitialization(new G01DetectorConstruction(file, format, unit));
